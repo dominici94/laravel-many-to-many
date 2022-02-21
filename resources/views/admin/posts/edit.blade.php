@@ -42,6 +42,26 @@
                             @enderror
                         </div>
 
+                        <div class="form-group">
+                            <h4>Tags</h4>
+
+                            @foreach ($tags as $tag)
+                                <div class="form-check form-check-inline">
+
+                                    @if (old("tags"))
+                                        <input class="form-check-input" type="checkbox" name="tags[]" id="{{$tag->slug}}" value="{{$tag->id}}" {{in_array($tag->id, old( "tags", [] ) ) ? 'checked' : '' }}>
+                                    @else
+                                    <input class="form-check-input" type="checkbox" name="tags[]" id="{{$tag->slug}}" value="{{$tag->id}}" {{$post->tags->contains($tag) ? 'checked' : '' }}>
+                                    @endif
+                                    <label class="form-check-label" for="{{$tag->slug}}">{{$tag->name}}</label>
+                                </div>
+                            @endforeach
+                            @error('tags')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+
+                        </div>
+
                         <div class="form-group form-check">
                             <input type="checkbox" class="form-check-input @error('published') is-invalid @enderror" name="published" id="published" {{old('published', $post->published) ? 'checked' : ''}}>
                             <label class="form-check-label" for="published">Pubblica</label>
