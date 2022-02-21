@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Post;
 use App\Category;
+use App\Tag;
 
 class PostController extends Controller
 {
@@ -15,7 +16,8 @@ class PostController extends Controller
         "title" => "required|string|max:120",
         "content" => "required",
         "published" => "sometimes|accepted",
-        "category_id" => "nullable|exists:categories,id"
+        "category_id" => "nullable|exists:categories,id",
+        "tags" => "nullable|exists:tags,id"
     ];
 
     /**
@@ -38,7 +40,8 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view("admin.posts.create", compact("categories"));
+        $tags = Tag::all();
+        return view("admin.posts.create", compact("categories", "tags"));
     }
 
     /**
@@ -63,18 +66,15 @@ class PostController extends Controller
         $newPost->content = $data['content'];
         $newPost->published = isset($data['published']);
         $newPost->category_id = $data['category_id'];
-
-        $slug = Str::of($newPost->title)->slug("-");
-        $count = 1;
-
-        while (Post::where("slug", $slug)->first()) {
-            $slug = Str::of($newPost->title)->slug("-") . "-{$count}";
-            $count++;
-        }
-
-        $newPost->slug = $slug;
+        $newPost->slug = $this->getSlug($newPost->title);
 
         $newPost->save();
+
+        if (isset($data["tags"])) {
+            $newPost->tags()->sync($data["tags"]);
+        }
+
+
         // redirect al post appena creato
 
         return redirect()->route("posts.show", $newPost->id);
@@ -126,14 +126,7 @@ class PostController extends Controller
             $slug = Str::of($post->title)->slug("-");
 
             if ($slug != $post->slug) {
-                $count = 1;
-
-                while (Post::where("slug", $slug)->first()) {
-                    $slug = Str::of($post->title)->slug("-") . "-{$count}";
-                    $count++;
-                }
-
-                $post->slug = $slug;
+                $post->slug = $this->getSlug($post->title);
             }
         }
 
@@ -159,5 +152,18 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route("posts.index");
+    }
+
+    private function getSlug($title)
+    {
+        $slug = Str::of($title)->slug("-");
+        $count = 1;
+
+        while (Post::where("slug", $slug)->first()) {
+            $slug = Str::of($title)->slug("-") . "-{$count}";
+            $count++;
+        }
+
+        return $slug;
     }
 }
