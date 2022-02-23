@@ -9,7 +9,7 @@
 
                 <div class="card-body">
                     
-                    <form action="{{route("posts.store")}}" method="POST">
+                    <form action="{{route("posts.store")}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label for="title">Titolo</label>
@@ -62,6 +62,27 @@
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="form-group">
+                            <img id="uploadPreview" class="w-100" src="https://via.placeholder.com/350x150">
+                            <label for="image">Aggiungi immagine</label>
+                            <input type="file" id="image" name="image" onchange="PreviewImage();">
+                            <script type="text/javascript">
+
+                                function PreviewImage() {
+                                    var oFReader = new FileReader();
+                                    oFReader.readAsDataURL(document.getElementById("image").files[0]);
+
+                                    oFReader.onload = function (oFREvent) {
+                                        document.getElementById("uploadPreview").src = oFREvent.target.result;
+                                    };
+                                };
+
+                            </script>
+                        </div>
+                        @error('image')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
 
                         <button type="submit" class="btn btn-primary">Crea Post</button>
 

@@ -8,6 +8,13 @@
                 <div class="card-header">{{$post->title}}</div>
 
                 <div class="card-body">
+                    @if ($post->image)
+                        <div class="mb-3">
+                            <img class="w-100" src="{{asset("storage/{$post->image}")}}" alt="{{$post->title}}">
+                        </div>
+                    @endif
+                    
+
                     <div class="mb-3">
                         Stato:
                         @if ($post->published)

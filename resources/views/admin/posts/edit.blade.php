@@ -9,7 +9,7 @@
 
                 <div class="card-body">
                     
-                    <form action="{{route("posts.update", $post->id)}}" method="POST">
+                    <form action="{{route("posts.update", $post->id)}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method("PUT")
 
@@ -69,6 +69,30 @@
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="form-group">
+                            @if ($post->image)
+                                <img id="uploadPreview" class="w-100" src="{{asset("storage/{$post->image}")}}" alt="{{$post->title}}">
+                                
+                            @endif
+                            <label for="image">Aggiungi immagine</label>
+                            <input type="file" id="image" name="image" onchange="PreviewImage();">
+                            <script type="text/javascript">
+
+                                function PreviewImage() {
+                                    var oFReader = new FileReader();
+                                    oFReader.readAsDataURL(document.getElementById("image").files[0]);
+
+                                    oFReader.onload = function (oFREvent) {
+                                        document.getElementById("uploadPreview").src = oFREvent.target.result;
+                                    };
+                                };
+
+                            </script>
+                        </div>
+                        @error('image')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
 
 
                         <button type="submit" class="btn btn-primary">Modifica Post</button>
